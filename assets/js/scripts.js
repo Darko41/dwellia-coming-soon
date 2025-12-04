@@ -1,4 +1,3 @@
-
 jQuery(document).ready(function() {	
 	
     /*
@@ -25,13 +24,18 @@ jQuery(document).ready(function() {
     /*
 	    Countdown initializer
 	*/
-	var now = new Date();
-	var countTo = 25 * 24 * 60 * 60 * 1000 + now.valueOf();    
-	$('.timer').countdown(countTo, function(event) {
+	// SET YOUR LAUNCH DATE HERE (YYYY, MM-1, DD, HH, MM, SS)
+	// Example: February 1, 2025 at 00:00:00
+	var launchDate = new Date(2026, 4, 1, 0, 0, 0); // Month is 0-indexed (0=Jan, 1=Feb, etc.)
+	
+	$('.timer').countdown(launchDate, function(event) {
 		$(this).find('.days').text(event.offset.totalDays);
-		$(this).find('.hours').text(event.offset.hours);
-		$(this).find('.minutes').text(event.offset.minutes);
-		$(this).find('.seconds').text(event.offset.seconds);
+		$(this).find('.hours').text(('0' + event.offset.hours).slice(-2)); // Add leading zero
+		$(this).find('.minutes').text(('0' + event.offset.minutes).slice(-2)); // Add leading zero
+		$(this).find('.seconds').text(('0' + event.offset.seconds).slice(-2)); // Add leading zero
+	}).on('finish.countdown', function() {
+		// When countdown finishes
+		$('.timer-wrapper').html('<h4>🎉 Platforma je sada dostupna! <br><small>Posetite dwellia.rs da započnete</small></h4>');
 	});
     	
 	/*
