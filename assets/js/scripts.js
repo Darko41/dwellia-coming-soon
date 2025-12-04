@@ -27,35 +27,45 @@ jQuery(document).ready(function() {
 	// SET YOUR LAUNCH DATE HERE (YYYY, MM-1, DD, HH, MM, SS)
 	// Example: February 1, 2025 at 00:00:00
 	var launchDate = new Date(2026, 4, 1, 0, 0, 0); // Month is 0-indexed (0=Jan, 1=Feb, etc.)
-	
+
 	$('.timer').countdown(launchDate, function(event) {
 		$(this).find('.days').text(event.offset.totalDays);
-		$(this).find('.hours').text(('0' + event.offset.hours).slice(-2)); // Add leading zero
-		$(this).find('.minutes').text(('0' + event.offset.minutes).slice(-2)); // Add leading zero
-		$(this).find('.seconds').text(('0' + event.offset.seconds).slice(-2)); // Add leading zero
+		$(this).find('.hours').text(('0' + event.offset.hours).slice(-2));
+		$(this).find('.minutes').text(('0' + event.offset.minutes).slice(-2));
+		$(this).find('.seconds').text(('0' + event.offset.seconds).slice(-2));
 	}).on('finish.countdown', function() {
-		// When countdown finishes
 		$('.timer-wrapper').html('<h4>🎉 Platforma je sada dostupna! <br><small>Posetite dwellia.rs da započnete</small></h4>');
 	});
-    	
-	/*
-	    Subscription form
-	*/	
-	$('.subscribe form').submit(function(e) {
-		e.preventDefault();
-	    var postdata = $('.subscribe form').serialize();
+
+    console.log('Script loaded, setting up form handler...');
+
+    /*
+	    Subscription form - DEBUG VERSION
+	*/
+	$('.form-inline').submit(function(e) {
+	    console.log('Form submitted!');
+	    e.preventDefault();
+
+	    var submitBtn = $(this).find('button[type="submit"]');
+	    var originalText = submitBtn.text();
+	    submitBtn.text('Slanje...').prop('disabled', true);
+
+	    var postdata = $(this).serialize();
+	    console.log('Sending data:', postdata);
+
 	    $.ajax({
 	        type: 'POST',
 	        url: 'assets/subscribe.php',
 	        data: postdata,
 	        dataType: 'json',
 	        success: function(json) {
+	            console.log('Server response:', json);
 	            if(json.valid == 0) {
 	                $('.success-message').hide();
 	                $('.error-message').hide();
-	                $('.error-message').html(json.message);
+	                $('.error-message').html('<div class="alert alert-danger">' + json.message + '</div>');
 	                $('.error-message').fadeIn('fast', function(){
-	                	$('.subscribe form').addClass('animated shake').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+	                	$('.form-inline').addClass('animated shake').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
 	            			$(this).removeClass('animated shake');
 	            		});
 	                });
@@ -63,12 +73,22 @@ jQuery(document).ready(function() {
 	            else {
 	                $('.error-message').hide();
 	                $('.success-message').hide();
-	                $('.subscribe form').hide();
-	                $('.success-message').html(json.message);
+	                $('.success-message').html('<div class="alert alert-success">' + json.message + '</div>');
 	                $('.success-message').fadeIn('fast', function(){
 	                	$('.top-content').backstretch("resize");
 	                });
+	                $('.form-inline').hide();
 	            }
+	        },
+	        error: function(xhr, status, error) {
+	            console.log('AJAX error:', error);
+	            $('.success-message').hide();
+                $('.error-message').hide();
+                $('.error-message').html('<div class="alert alert-danger">Greška u konekciji. Pokušajte ponovo.</div>');
+                $('.error-message').fadeIn('fast');
+	        },
+	        complete: function() {
+	            submitBtn.text(originalText).prop('disabled', false);
 	        }
 	    });
 	});

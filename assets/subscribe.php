@@ -12,7 +12,7 @@ if($_POST) {
     // ============================================
 
     // Your main email where all form submissions will go
-    $emailTo = 'noreply@iterials.com'; // 
+    $emailTo = 'noreply@iterials.com'; //
 
     // Your website/company name
     $siteName = 'Dwellia';
